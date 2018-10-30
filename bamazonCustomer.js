@@ -1,6 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
+var numProducts = 0;
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -21,8 +22,10 @@ function printProducts() {
         // Log all results of the SELECT statement
         console.log("item_id  |  Name  |  Price  |  Quantity");
         var arr = [];
+        numProducts = 0;
         res.forEach(element => {
             console.log(element.item_id + " | " + element.product_name + " | " + element.price + "  |  " + element.stock_quantity);
+            numProducts++;
         });
         customerInput();
     });
@@ -38,20 +41,26 @@ function customerInput() {
             message: "How many items do you want to buy?"
         }
     ]).then(function (answer) {
-        connection.query("SELECT * FROM products WHERE item_id = " + answer.id, function (err, res) {
-            if (err) throw err;
-            else if (parseInt(res[0].stock_quantity) < parseInt(answer.amount) || res[0].stock_quantity == 0) {
-                insufficientStock(res[0].product_name, res[0].stock_quantity);
-
-            } else if (parseInt(answer.amount) < 0) {
-                incorrectAmount();
-            } 
+        if (parseInt(answer.amount) <= 0) {
+            console.log("Number of items to purchase must be greater than 0.");
+            connection.end();
+        } else if (parseInt(id) > numProducts || parseInt(id) < 1) {
+            console.log("Item ID given doesn't match an item in our database!");
+        } else {
+            connection.query("SELECT * FROM products WHERE item_id = " + answer.id, function (err, res) {
+                if (err) throw err;
+                if (parseInt(res[0].stock_quantity) < parseInt(answer.amount) || res[0].stock_quantity == 0) {
+                    insufficientStock(res[0].product_name, res[0].stock_quantity);
+                } 
+                else if (parseInt(answer.amount) < 0) {
+                    incorrectAmount();
+                } 
                 else {
-                updateStock(parseInt(answer.id), parseInt(answer.amount));
-                printOrder(res[0], parseInt(answer.amount));
-            }
-
-        })
+                    updateStock(parseInt(answer.id), parseInt(answer.amount));
+                    printOrder(res[0], parseInt(answer.amount));
+                }
+            })
+        }
     })
 }
 
@@ -62,7 +71,7 @@ function incorrectAmount() {
 
 function insufficientStock(name, stock) {
     console.log("We don't have enough stock of that item to complete this order.");
-    console.log("We currently have " + stock +" " + name + "(s) in stock.")
+    console.log("We currently have " + stock + " " + name + "(s) in stock.")
     connection.end();
 }
 
