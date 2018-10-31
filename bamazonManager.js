@@ -1,7 +1,8 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
-var numProducts = 0;
+var productsListGenerated = false;
+var numProducts = -1;
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -46,11 +47,13 @@ function updateStock(id, amt, sign) {
 }
 
 function printProducts() {
+    numProducts=0;
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         // Log all results of the SELECT statement
         console.log("item_id  |  Name  |  Price  |  Quantity");
         res.forEach(element => {
+            numProducts++;      //used for item_id validation later
             console.log(element.item_id + " | " + element.product_name + " | " + element.price + "  |  " + element.stock_quantity);
         });
         connection.end();
@@ -84,12 +87,25 @@ function addInventory() {
             console.log("Resupply amount cannot be less than zero.");
             return;
         }
+        if(!validateID(answer.id)){
+            console.log("Item ID given doesn't match a product in our database.");
+            return;
+        }
         else {
             updateStock(answer.id,answer.amount,1);
+            numProducts--;
         }
         connection.end();
     });
 }
+//validates that the argument given is an item id that maps to an entry in the database
+function validateID(id){
+    if(parseInt(id) > numProducts || parseInt(id) < 1){
+        return false;
+    }
+    return true;
+}
+
 //validates that the argument given is a number that works with our database. We don't want a negative price
 function validatePrice(price) {
     if (isNaN(price)) {

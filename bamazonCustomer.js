@@ -55,7 +55,7 @@ function customerInput() {
                     incorrectAmount();
                 } 
                 else {
-                    updateStock(parseInt(answer.id), parseInt(answer.amount));
+                    updateStock(answer.id, answer.amount,-1);
                     printOrder(res[0], parseInt(answer.amount));
                 }
             })
@@ -93,10 +93,22 @@ function insufficientStock(name, stock) {
     connection.end();
 }
 
-function updateStock(id, amt) {
-    connection.query("UPDATE products SET stock_quantity = stock_quantity - " + amt + " WHERE item_id = " + id + ";", function (err, res) {
-        if (err) throw err;
-    });
+//id = item_id in sql database
+//amt = amount to update item by
+//sign = 1 for add amt and -1 for subtract amt
+function updateStock(id, amt, sign) {
+    if (sign == -1) {
+        connection.query("UPDATE products SET stock_quantity = stock_quantity - " + amt + " WHERE item_id = " + id + ";", function (err, res) {
+            if (err) throw err;
+            console.log("Stock Updated.");
+        });
+    }
+    else {
+        connection.query("UPDATE products SET stock_quantity = stock_quantity + " + amt + " WHERE item_id = " + id + ";", function (err, res) {
+            if (err) throw err;
+            console.log("Stock Updated.");
+        });
+    }
     connection.end();
 }
 
