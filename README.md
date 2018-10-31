@@ -5,6 +5,21 @@ The project uses mysql and node so make sure those are installed before running.
 Before running the javascript files the user should run schema.sql in mysql.
 
 *  __After getting the mysql connection up and running make sure to modify the port, user, and password fields in the javascript files to match those of your mysql connection.__
+```javascript
+var connection = mysql.createConnection({
+    host: "localhost",
+
+    // Your port; if not 3306
+    port: yourPort,
+
+    // Your username; if not root
+    user: yourUsername,
+
+    // Your password; if not blank
+    password: yourPassword,
+    database: "productsDB"
+});
+```
 
 # bamazonCustomer
 * The bamazonCustomer file connects to the product database and prints the entirety of the table.
