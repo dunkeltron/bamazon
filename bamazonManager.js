@@ -43,7 +43,6 @@ function updateStock(id, amt, sign) {
             console.log("Stock Updated.");
         });
     }
-    connection.end();
 }
 
 function printProducts() {
@@ -91,14 +90,13 @@ function addInventory() {
         }
         else {
             updateStock(answer.id,answer.amount,1);
-            numProducts--;
         }
         connection.end();
     });
 }
 //validates that the argument given is an item id that maps to an entry in the database
 function validateID(id){
-    if(parseInt(id) > numProducts || parseInt(id) < 1){        
+    if(isNaN(id) || parseInt(id) > numProducts || parseInt(id) < 1){        
         console.log();
         console.log("Item ID given doesn't match a product in our database.");
         return false;
@@ -158,6 +156,7 @@ function addNewProduct() {
             connection.query(queryString, function (err, res) {
                 if (err) throw err;
                 console.log("product added!");
+                numProducts++;
             })
         }
         connection.end();

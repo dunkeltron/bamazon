@@ -42,17 +42,12 @@ function customerInput() {
         }
     ]).then(function (answer) {
         if (!validateAmount(answer.amount)) {
-            console.log("Number of items to purchase must be greater than 0.");
         } else if (!validateID(answer.id)) {
-            console.log("Item ID given doesn't match an item in our database!");
         } else {
             connection.query("SELECT * FROM products WHERE item_id = " + answer.id, function (err, res) {
                 if (err) throw err;
                 if (!hasEnoughStock(res[0].stock_quantity,answer.amount)) {
                     insufficientStock(res[0].product_name, res[0].stock_quantity);
-                } 
-                else if (!validateAmount(answer.amount) ) {
-                    incorrectAmount();
                 } 
                 else {
                     updateStock(answer.id, answer.amount,-1);
@@ -60,37 +55,38 @@ function customerInput() {
                 }
             })
         }
-        connection.end();
-    })
+        
+    });
 }
 function validateID(id){
-    if(parseInt(id) > numProducts || parseInt(id) < 1){
+    if(isNaN(id) || parseInt(id) > numProducts || parseInt(id) < 1){        
+        console.log();
+        console.log("Item ID given doesn't match a product in our database.");
         return false;
     }
     return true;
 }
 function validateAmount(amt){
-    if(isNaN(amt) || parseInt(amt)<0){
+    if(isNaN(amt) || parseInt(amt)<=0){
         console.log("Amount of product to purchase must be a number larger than zero.");
+        connection.end();
         return false;
     }
     return true;
 }
-function incorrectAmount() {
-    console.log("Invalid amount. Cannot buy a negative amount of items.");
-    connection.end();
-}
 function hasEnoughStock(stockQty,purchaseQty){
     //
     if (parseInt(stockQty) < parseInt(purchaseQty) || stockQty == 0){
+
         return false;
     }
     return true;
 }
 function insufficientStock(name, stock) {
     console.log("We don't have enough stock of that item to complete this order.");
-    console.log("We currently have " + stock + " " + name + "(s) in stock.")
+    console.log("We currently have " + stock + " " + name + "(s) in stock.");
     connection.end();
+
 }
 
 //id = item_id in sql database
@@ -101,19 +97,20 @@ function updateStock(id, amt, sign) {
         connection.query("UPDATE products SET stock_quantity = stock_quantity - " + amt + " WHERE item_id = " + id + ";", function (err, res) {
             if (err) throw err;
             console.log("Stock Updated.");
+            connection.end();
         });
     }
     else {
         connection.query("UPDATE products SET stock_quantity = stock_quantity + " + amt + " WHERE item_id = " + id + ";", function (err, res) {
             if (err) throw err;
             console.log("Stock Updated.");
+            connection.end();
         });
     }
-    connection.end();
 }
 
 function printOrder(res, amount) {
     console.log("Purchase made! You bought " + amount + " " + res.product_name + "(s) for $" + (res.price * amount) + ".");
-
+    connection.end();
 }
 printProducts();
