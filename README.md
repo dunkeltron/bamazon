@@ -4,15 +4,15 @@ The project uses mysql and node so make sure those are installed before running.
 
 Before running the javascript files the user should run schema.sql in mysql.
 
-# After getting the mysql connection up and running make sure to modify the port, user, and password fields in the javascript files to match those of your mysql connection.
+*  __After getting the mysql connection up and running make sure to modify the port, user, and password fields in the javascript files to match those of your mysql connection.__
 
 # bamazonCustomer
-The bamazonCustomer file connects to the product database and prints the entirety of the table.
+* The bamazonCustomer file connects to the product database and prints the entirety of the table.
 The customer can then pick out and choose which item they want to buy and how much of that item they want to buy. 
 **There is currently no support for buying multiple different items at this time.**
-The customer must enter an id number greater than zero and less than the number of products in the list.
-If the customer enters an invalid product id number the program will print a message then exit without making a purchase. There are examples of this error here.
-Similarly if the customer enters and invalid number of items to purchase the program will print a message then exit without making a purchase.
+* The customer must enter an id number greater than zero and less than the number of products in the list.
+* If the customer enters an invalid product id number the program will print a message then exit without making a purchase. There are examples of this error here.
+* Similarly if the customer enters and invalid number of items to purchase the program will print a message then exit without making a purchase.
 
 # Example Screenshots #
 # bamazonCustomer 
