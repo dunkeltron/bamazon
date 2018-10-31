@@ -5,6 +5,7 @@ The project uses mysql and node so make sure those are installed before running.
 Before running the javascript files the user should run schema.sql in mysql.
 
 *  __After getting the mysql connection up and running make sure to modify the port, user, and password fields in the javascript files to match those of your mysql connection.__
+* Your var connection should look like this in both bamazonCustomer.js and bamazonManager.js
 ```javascript
 var connection = mysql.createConnection({
     host: "localhost",
