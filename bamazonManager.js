@@ -1,7 +1,12 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
-var productsListGenerated = false;
+var Table = require('cli-table');
+//table array used for cli-table package
+var table = new Table({
+    head: ['item id', 'name', "price", "quantity"],
+    colWidths: [10, 30, 10, 10]
+});
 var numProducts = -1;
 var connection = mysql.createConnection({
     host: "localhost",
@@ -36,8 +41,7 @@ function updateStock(id, amt, sign) {
             if (err) throw err;
             console.log("Stock Updated.");
         });
-    }
-    else {
+    } else {
         connection.query("UPDATE products SET stock_quantity = stock_quantity + " + amt + " WHERE item_id = " + id + ";", function (err, res) {
             if (err) throw err;
             console.log("Stock Updated.");
@@ -45,34 +49,40 @@ function updateStock(id, amt, sign) {
     }
 }
 
+
 function printProducts() {
-    numProducts=0;
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
+
         // Log all results of the SELECT statement
-        console.log("item_id  |  Name  |  Price  |  Quantity");
+        numProducts = 0;
         res.forEach(element => {
-            numProducts++;      //used for item_id validation later
-            console.log(element.item_id + " | " + element.product_name + " | " + element.price + "  |  " + element.stock_quantity);
+            table.push([element.item_id, element.product_name, element.price, element.stock_quantity]);
+            numProducts++;
         });
+        console.log(table.toString());
         connection.end();
     });
 }
+
 
 function printLowInv() {
     connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
         if (err) throw err;
 
-        console.log("item_id | Name | Quantity");
+        numProducts = 0;
         res.forEach(element => {
-            console.log(element.item_id + " | " + element.product_name + " | " + element.stock_quantity);
+            table.push([element.item_id, element.product_name, element.price, element.stock_quantity]);
+            numProducts++;
         });
+
+        console.log(table.toString());
         connection.end();
     })
 }
+
 function addInventory() {
-    inquirer.prompt([
-        {
+    inquirer.prompt([{
             message: "What is the item ID of the item you would like to restock?",
             name: "id"
         },
@@ -85,18 +95,17 @@ function addInventory() {
         if (!validateAmount(answer.amount)) {
             return;
         }
-        if(!validateID(answer.id)){
+        if (!validateID(answer.id)) {
             return;
-        }
-        else {
-            updateStock(answer.id,answer.amount,1);
+        } else {
+            updateStock(answer.id, answer.amount, 1);
         }
         connection.end();
     });
 }
 //validates that the argument given is an item id that maps to an entry in the database
-function validateID(id){
-    if(isNaN(id) || parseInt(id) > numProducts || parseInt(id) < 1){        
+function validateID(id) {
+    if (isNaN(id) || parseInt(id) > numProducts || parseInt(id) < 1) {
         console.log();
         console.log("Item ID given doesn't match a product in our database.");
         return false;
@@ -110,8 +119,7 @@ function validatePrice(price) {
         console.log();
         console.log("Price must be number.")
         return false;
-    }
-    else if (parseInt(price) < 0) {
+    } else if (parseInt(price) < 0) {
         console.log();
         console.log("Price must be a positive integer.")
         return false;
@@ -127,9 +135,9 @@ function validateAmount(amt) {
     }
     return true;
 }
+
 function addNewProduct() {
-    inquirer.prompt([
-        {
+    inquirer.prompt([{
             message: "What is the name of the product you would like to add?",
             name: "name"
         },
@@ -162,6 +170,7 @@ function addNewProduct() {
         connection.end();
     });
 }
+
 function managerInput() {
     inquirer.prompt([{
         name: "method",
