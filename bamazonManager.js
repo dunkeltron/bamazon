@@ -26,11 +26,22 @@ function insufficientStock(name, stock) {
     console.log("We currently have " + stock + " " + name + "(s) in stock.")
     connection.end();
 }
-
-function updateStock(id, amt) {
-    connection.query("UPDATE products SET stock_quantity = stock_quantity - " + amt + " WHERE item_id = " + id + ";", function (err, res) {
-        if (err) throw err;
-    });
+//id = item_id in sql database
+//amt = amount to update item by
+//sign = 1 for add amt and -1 for subtract amt
+function updateStock(id, amt, sign) {
+    if (sign == -1) {
+        connection.query("UPDATE products SET stock_quantity = stock_quantity - " + amt + " WHERE item_id = " + id + ";", function (err, res) {
+            if (err) throw err;
+            console.log("Stock Updated.");
+        });
+    }
+    else {
+        connection.query("UPDATE products SET stock_quantity = stock_quantity + " + amt + " WHERE item_id = " + id + ";", function (err, res) {
+            if (err) throw err;
+            console.log("Stock Updated.");
+        });
+    }
     connection.end();
 }
 
@@ -57,87 +68,85 @@ function printLowInv() {
         connection.end();
     })
 }
-function addInventory(){
+function addInventory() {
     inquirer.prompt([
         {
-            message:"What is the item ID of the item you would like to restock?",
-            name:"id"
+            message: "What is the item ID of the item you would like to restock?",
+            name: "id"
         },
         {
-            message:"How much stock are you adding to inventory?",
-            name:"amount"
+            message: "How much stock are you adding to inventory?",
+            name: "amount"
         }
-    ]).then(function (answer){
-        var intID = parseInt(answer.id);
-        var intAmt = parseInt(answer.amount);
-        if(intAmt<0){
+    ]).then(function (answer) {
+        //validateAmount returns false if the parameter passed to it is NaN or less than zero so we need to invert the value for intended effect
+        if (!validateAmount(answer.amount)) {
             console.log("Resupply amount cannot be less than zero.");
             return;
         }
-        else{
-            var queryString = "UPDATE products SET stock_quantity = stock_quantity + " + intAmt + " WHERE item_id = " + intID + ";";
-            connection.query(queryString,function(err,res){
-                if (err) throw err;
-
-                console.log("Stock updated!");
-            })
+        else {
+            updateStock(answer.id,answer.amount,1);
         }
         connection.end();
     });
 }
-function validatePrice(price){
-    if(isNaN(price)){
+//validates that the argument given is a number that works with our database. We don't want a negative price
+function validatePrice(price) {
+    if (isNaN(price)) {
         console.log();
         console.log("Price must be number.")
         return false;
     }
-    else if (parseInt(price) <0 ){
+    else if (parseInt(price) < 0) {
         console.log();
         console.log("Price must be a positive integer.")
         return false;
     }
-        return true;
+    return true;
 }
-function validateAmount(amt){
-    if(isNaN(amt) || parseInt(amt)<0){
+//validates that the argument given is a number and is a number that works with our database (we don't want to have stock quantity less than zero)
+function validateAmount(amt) {
+    if (isNaN(amt) || parseInt(amt) < 0) {
+        console.log();
         console.log("Amount of product must be a number larger than zero.");
         return false;
     }
     return true;
 }
-function addNewProduct(){
+function addNewProduct() {
     inquirer.prompt([
         {
-            message:"What is the name of the product you would like to add?",
-            name:"name"
+            message: "What is the name of the product you would like to add?",
+            name: "name"
         },
         {
-            message:"What department does the new product belong in?",
-            name:"deptName"
+            message: "What department does the new product belong in?",
+            name: "deptName"
         },
         {
-            message:"What is the price of the new product?",
-            name:"price"
+            message: "What is the price of the new product?",
+            name: "price"
         },
         {
-            message:"How many units of the new product are there for sale?",
-            name:"amount"
+            message: "How many units of the new product are there for sale?",
+            name: "amount"
         }
-    ]).then(function (answer){
-        if(validatePrice(answer.price) && validateAmount(answer.amount)){
-            var queryString = "INSERT INTO products (product_name,department_name,price,stock_quantity) VALUES (\'"+
-            answer.name.toUpperCase()+"\', \'"+answer.deptName.toUpperCase()+"\', "+ answer.price +", "+answer.amount+");";
-            console.log(queryString);
-            connection.query(queryString,function(err,res){
+    ]).then(function (answer) {
+        //check if the price and amount can interpreted as numbers in mysql
+        if (validatePrice(answer.price) && validateAmount(answer.amount)) {
+            //build the mysql query
+            var queryString = "INSERT INTO products (product_name,department_name,price,stock_quantity) VALUES (\'" +
+                answer.name.toUpperCase() + "\', \'" + answer.deptName.toUpperCase() + "\', " + answer.price + ", " + answer.amount + ");";
+
+            //attempt to perform the mysql query
+            connection.query(queryString, function (err, res) {
                 if (err) throw err;
                 console.log("product added!");
             })
         }
         connection.end();
-        console.log(answer.name,answer.price, answer.amount);
     });
 }
-
 function managerInput() {
     inquirer.prompt([{
         name: "method",
