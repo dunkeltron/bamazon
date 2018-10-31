@@ -1,6 +1,11 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-
+var Table = require('cli-table');
+//table array used for cli-table package
+var table = new Table({
+    head: ['item id', 'name',"price","quantity"]
+  , colWidths: [10, 30, 10, 10]
+});
 var numProducts = 0;
 var connection = mysql.createConnection({
     host: "localhost",
@@ -17,18 +22,21 @@ var connection = mysql.createConnection({
 });
 
 function printProducts() {
-    connection.query("SELECT * FROM products", function (err, res) {
-        if (err) throw err;
-        // Log all results of the SELECT statement
-        console.log("item_id  |  Name  |  Price  |  Quantity");
-        var arr = [];
-        numProducts = 0;
-        res.forEach(element => {
-            console.log(element.item_id + " | " + element.product_name + " | " + element.price + "  |  " + element.stock_quantity);
-            numProducts++;
+    if (tableBuilt == false) {
+        connection.query("SELECT * FROM products", function (err, res) {
+            if (err) throw err;
+
+            // Log all results of the SELECT statement
+            numProducts = 0;
+            res.forEach(element => {
+                table.push([element.item_id, element.product_name, + element.price, element.stock_quantity]);
+                numProducts++;
+            });
+            tableBuilt = true;
         });
-        customerInput();
-    });
+    }
+    console.log(table.toString());
+    customerInput();
 }
 
 function customerInput() {
