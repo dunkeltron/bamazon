@@ -84,11 +84,9 @@ function addInventory() {
     ]).then(function (answer) {
         //validateAmount returns false if the parameter passed to it is NaN or less than zero so we need to invert the value for intended effect
         if (!validateAmount(answer.amount)) {
-            console.log("Resupply amount cannot be less than zero.");
             return;
         }
         if(!validateID(answer.id)){
-            console.log("Item ID given doesn't match a product in our database.");
             return;
         }
         else {
@@ -100,7 +98,9 @@ function addInventory() {
 }
 //validates that the argument given is an item id that maps to an entry in the database
 function validateID(id){
-    if(parseInt(id) > numProducts || parseInt(id) < 1){
+    if(parseInt(id) > numProducts || parseInt(id) < 1){        
+        console.log();
+        console.log("Item ID given doesn't match a product in our database.");
         return false;
     }
     return true;
