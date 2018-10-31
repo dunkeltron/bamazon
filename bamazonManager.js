@@ -82,8 +82,41 @@ function addInventory(){
                 console.log("Stock updated!");
             })
         }
+        connection.end();
     });
 }
+function addNewProduct(){
+    inquirer.prompt([
+        {
+            message:"What is the name of the product you would like to add?",
+            name:"name"
+        },
+        {
+            message:"What is the price of the new product?",
+            name:"price",
+            validate: function validatePrice(price){
+                if(isNaN(parseInt(price))){
+                    console.err("Price must be number.")
+                }
+                else if (parseInt(price) <0 ){
+                    console.err("Price must be a positive integer.")
+                }
+            }
+        },
+        {
+            message:"How many units of the new product are there for sale?",
+            name:"amount",
+            validate: function validateAmount(amt){
+                if(isNaN(parseInt(amt)) || parseInt(amt)<0){
+                    console.err("Amount of product must be a number larger than zero.");
+                }
+            }
+        }
+    ]).then(function (answer){
+
+    });
+}
+
 function managerInput() {
     inquirer.prompt([{
         name: "method",
