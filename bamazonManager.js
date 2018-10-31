@@ -57,7 +57,33 @@ function printLowInv() {
         connection.end();
     })
 }
+function addInventory(){
+    inquirer.prompt([
+        {
+            message:"What is the item ID of the item you would like to restock?",
+            name:"id"
+        },
+        {
+            message:"How much stock are you adding to inventory?",
+            name:"amount"
+        }
+    ]).then(function (answer){
+        var intID = parseInt(answer.id);
+        var intAmt = parseInt(answer.amount);
+        if(intAmt<0){
+            console.log("Resupply amount cannot be less than zero.");
+            return;
+        }
+        else{
+            var queryString = "UPDATE products SET stock_quantity = stock_quantity + " + intAmt + " WHERE item_id = " + intID + ";";
+            connection.query(queryString,function(err,res){
+                if (err) throw err;
 
+                console.log("Stock updated!");
+            })
+        }
+    });
+}
 function managerInput() {
     inquirer.prompt([{
         name: "method",
