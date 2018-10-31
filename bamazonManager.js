@@ -33,6 +33,7 @@ function updateStock(id, amt) {
     });
     connection.end();
 }
+
 function printProducts() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
@@ -44,10 +45,11 @@ function printProducts() {
         connection.end();
     });
 }
-function printLowInv(){
-    connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res){
+
+function printLowInv() {
+    connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
         if (err) throw err;
-        
+
         console.log("item_id | Name | Quantity");
         res.forEach(element => {
             console.log(element.item_id + " | " + element.product_name + " | " + element.stock_quantity);
@@ -55,29 +57,26 @@ function printLowInv(){
         connection.end();
     })
 }
-function managerInput(){
-    inquirer.prompt([
-        {   
-            name:"method",
-            type:"list",
-            message: "Which action would you like to perform?",
-            choices:["View Products for Sale","View Low Inventory","Add to Inventory","Add New Product"]
-        }
-    ]).then(function (answer){
-        if(answer.method.toUpperCase() === "VIEW PRODUCTS FOR SALE"){
+
+function managerInput() {
+    inquirer.prompt([{
+        name: "method",
+        type: "list",
+        message: "Which action would you like to perform?",
+        choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
+    }]).then(function (answer) {
+        if (answer.method.toUpperCase() === "VIEW PRODUCTS FOR SALE") {
             printProducts();
-        }
-        else if(answer.method.toUpperCase() === "VIEW LOW INVENTORY"){
+        } else if (answer.method.toUpperCase() === "VIEW LOW INVENTORY") {
             printLowInv();
-        }
-        else if(answer.method.toUpperCase() === "ADD TO INVENTORY"){
+        } else if (answer.method.toUpperCase() === "ADD TO INVENTORY") {
             addInventory();
-        }
-        else if(answer.method.toUpperCase() === "ADD NEW PRODUCT"){
+        } else if (answer.method.toUpperCase() === "ADD NEW PRODUCT") {
             addNewProduct();
-        }
-        else{
+        } else {
             console.err("Unexpected selection.");
         }
     });
+
 }
+managerInput();
