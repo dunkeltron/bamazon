@@ -85,6 +85,26 @@ function addInventory(){
         connection.end();
     });
 }
+function validatePrice(price){
+    if(isNaN(price)){
+        console.log();
+        console.log("Price must be number.")
+        return false;
+    }
+    else if (parseInt(price) <0 ){
+        console.log();
+        console.log("Price must be a positive integer.")
+        return false;
+    }
+        return true;
+}
+function validateAmount(amt){
+    if(isNaN(amt) || parseInt(amt)<0){
+        console.log("Amount of product must be a number larger than zero.");
+        return false;
+    }
+    return true;
+}
 function addNewProduct(){
     inquirer.prompt([
         {
@@ -92,28 +112,29 @@ function addNewProduct(){
             name:"name"
         },
         {
+            message:"What department does the new product belong in?",
+            name:"deptName"
+        },
+        {
             message:"What is the price of the new product?",
-            name:"price",
-            validate: function validatePrice(price){
-                if(isNaN(parseInt(price))){
-                    console.err("Price must be number.")
-                }
-                else if (parseInt(price) <0 ){
-                    console.err("Price must be a positive integer.")
-                }
-            }
+            name:"price"
         },
         {
             message:"How many units of the new product are there for sale?",
-            name:"amount",
-            validate: function validateAmount(amt){
-                if(isNaN(parseInt(amt)) || parseInt(amt)<0){
-                    console.err("Amount of product must be a number larger than zero.");
-                }
-            }
+            name:"amount"
         }
     ]).then(function (answer){
-
+        if(validatePrice(answer.price) && validateAmount(answer.amount)){
+            var queryString = "INSERT INTO products (product_name,department_name,price,stock_quantity) VALUES (\'"+
+            answer.name.toUpperCase()+"\', \'"+answer.deptName.toUpperCase()+"\', "+ answer.price +", "+answer.amount+");";
+            console.log(queryString);
+            connection.query(queryString,function(err,res){
+                if (err) throw err;
+                console.log("product added!");
+            })
+        }
+        connection.end();
+        console.log(answer.name,answer.price, answer.amount);
     });
 }
 
