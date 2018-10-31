@@ -31,12 +31,12 @@ The customer can then pick out and choose which item they want to buy and how mu
 * Similarly if the customer enters and invalid number of items to purchase the program will print a message then exit without making a purchase.
 
 # Example Screenshots #
-[Entering a string into purchase amount.](./images/bamazonCustomer/amtPurchaseNotNum.png)
-[Entering a product ID less than the range of product IDs.](./images/bamazonCustomer/idLessThanRange.png)
-[Entering a product ID greater than the range of product IDs.](./images/bamazonCustomer/idMoreThanRange.png)
-[Entering a string as a product ID.](./images/bamazonCustomer/idNotNum.png)
-[Entering a negative number as a purchase amount.](./images/bamazonCustomer/purchaseNegative.png)
-[Entering zero as a purchase amount.](./images/bamazonCustomer/purchasezero.png)
+* [Entering a string into purchase amount.](./images/bamazonCustomer/amtPurchaseNotNum.png)
+* [Entering a product ID less than the range of product IDs.](./images/bamazonCustomer/idLessThanRange.png)
+* [Entering a product ID greater than the range of product IDs.](./images/bamazonCustomer/idMoreThanRange.png)
+* [Entering a string as a product ID.](./images/bamazonCustomer/idNotNum.png)
+* [Entering a negative number as a purchase amount.](./images/bamazonCustomer/purchaseNegative.png)
+* [Entering zero as a purchase amount.](./images/bamazonCustomer/purchasezero.png)
 
 # bamazonManager
 The bamazonManager file also connects to the product database. However, this file makes more extensive use of the data.
