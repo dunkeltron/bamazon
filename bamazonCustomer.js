@@ -3,7 +3,7 @@ var inquirer = require("inquirer");
 var Table = require('cli-table');
 //table array used for cli-table package
 var table = new Table({
-    head: ['item id', 'name', "price", "quantity"],
+    head: ['item id', 'Product Name', "Price ($)", "quantity"],
     colWidths: [10, 30, 10, 10]
 });
 //create table flag so that we only have to build the table once
@@ -57,7 +57,13 @@ function customerInput() {
             message: "How many items do you want to buy?"
         }
     ]).then(function (answer) {
-        if (!validateAmount(answer.amount)) {} else if (!validateID(answer.id)) {} else {
+        if (!validateAmount(answer.amount)) {
+            connection.end();
+        } 
+        else if (!validateID(answer.id)) {
+            connection.end();
+        }
+        else {
             connection.query("SELECT * FROM products WHERE item_id = " + answer.id, function (err, res) {
                 if (err) throw err;
                 if (!hasEnoughStock(res[0].stock_quantity, answer.amount)) {
@@ -84,7 +90,6 @@ function validateID(id) {
 function validateAmount(amt) {
     if (isNaN(amt) || parseInt(amt) <= 0) {
         console.log("Amount of product to purchase must be a number larger than zero.");
-        connection.end();
         return false;
     }
     return true;

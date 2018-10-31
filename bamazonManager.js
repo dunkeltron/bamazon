@@ -3,7 +3,7 @@ var inquirer = require("inquirer");
 var Table = require('cli-table');
 //table array used for cli-table package
 var table = new Table({
-    head: ['item id', 'name', "price", "quantity"],
+    head: ['item id', 'Product Name', "Price ($)", "quantity"],
     colWidths: [10, 30, 10, 10]
 });
 var numProducts = -1;
@@ -72,7 +72,6 @@ function printLowInv() {
         numProducts = 0;
         res.forEach(element => {
             table.push([element.item_id, element.product_name, element.price, element.stock_quantity]);
-            numProducts++;
         });
 
         console.log(table.toString());
@@ -116,7 +115,7 @@ function validateID(id) {
 function validatePrice(price) {
     if (isNaN(price)) {
         console.log();
-        console.log("Price must be number.")
+        console.log("Price must be a positive number.")
         return false;
     } else if (parseInt(price) < 0) {
         console.log();
@@ -162,11 +161,11 @@ function addNewProduct() {
             //attempt to perform the mysql query
             connection.query(queryString, function (err, res) {
                 if (err) throw err;
-                console.log("product added!");
-                numProducts++;
+                console.log("Added "+answer.amount+" " + answer.name+"(s) to products database.");
+                printProducts();
             })
         }
-        connection.end();
+        
     });
 }
 
