@@ -31,7 +31,6 @@ The customer can then pick out and choose which item they want to buy and how mu
 * Similarly if the customer enters and invalid number of items to purchase the program will print a message then exit without making a purchase.
 
 # Example Screenshots #
-# bamazonCustomer 
 [Entering a string into purchase amount.](./images/bamazonCustomer/amtPurchaseNotNum.png)
 [Entering a product ID less than the range of product IDs.](./images/bamazonCustomer/idLessThanRange.png)
 [Entering a product ID greater than the range of product IDs.](./images/bamazonCustomer/idMoreThanRange.png)
