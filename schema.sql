@@ -43,3 +43,4 @@ VALUES ("Led Desk Lamp", "Home & Office", 30, 3);
 INSERT INTO products (product_name,department_name,price,stock_quantity)
 VALUES ("Dinner Fork Set. (12 Pieces)", "Kitchen", 13, 6);
 
+

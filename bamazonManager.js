@@ -6,6 +6,10 @@ var table = new Table({
     head: ['item id', 'Product Name', "Price ($)", "quantity"],
     colWidths: [10, 30, 10, 10]
 });
+var table2 = new Table({
+    head: ['item id', 'Product Name', "Price ($)", "quantity"],
+    colWidths: [10, 30, 10, 10]
+});
 var numProducts = -1;
 var connection = mysql.createConnection({
     host: "localhost",
@@ -31,28 +35,16 @@ function insufficientStock(name, stock) {
     console.log("We currently have " + stock + " " + name + "(s) in stock.")
     connection.end();
 }
-//id = item_id in sql database
-//amt = amount to update item by
-//sign = 1 for add amt and -1 for subtract amt
-function updateStock(id, amt, sign) {
-    if (sign == -1) {
-        connection.query("UPDATE products SET stock_quantity = stock_quantity - " + amt + " WHERE item_id = " + id + ";", function (err, res) {
-            if (err) throw err;
-            console.log("Stock Updated.");
-        });
-    } else {
-        connection.query("UPDATE products SET stock_quantity = stock_quantity + " + amt + " WHERE item_id = " + id + ";", function (err, res) {
-            if (err) throw err;
-            console.log("Stock Updated.");
-        });
-    }
-}
+
 
 
 function printProducts() {
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
-
+        table = new Table({
+            head: ['item id', 'Product Name', "Price ($)", "quantity"],
+            colWidths: [10, 30, 10, 10]
+        });
         // Log all results of the SELECT statement
         numProducts = 0;
         res.forEach(element => {
@@ -60,22 +52,25 @@ function printProducts() {
             numProducts++;
         });
         console.log(table.toString());
-        connection.end();
+        managerInput();
     });
 }
 
 
 function printLowInv() {
+    console.log();
     connection.query("SELECT * FROM products WHERE stock_quantity < 5", function (err, res) {
         if (err) throw err;
 
-        numProducts = 0;
-        res.forEach(element => {
-            table.push([element.item_id, element.product_name, element.price, element.stock_quantity]);
+        table2 = new Table({
+            head: ['item id', 'Product Name', "Price ($)", "quantity"],
+            colWidths: [10, 30, 10, 10]
         });
-
-        console.log(table.toString());
-        connection.end();
+        res.forEach(element => {
+            table2.push([element.item_id, element.product_name, element.price, element.stock_quantity]);
+        });
+        console.log(table2.toString());
+        managerInput();
     })
 }
 
@@ -91,18 +86,37 @@ function addInventory() {
     ]).then(function (answer) {
         //validateAmount returns false if the parameter passed to it is NaN or less than zero so we need to invert the value for intended effect
         if (!validateAmount(answer.amount)) {
+            connection.end();
             return;
         }
         if (!validateID(answer.id)) {
+            connection.end();
             return;
         } else {
             updateStock(answer.id, answer.amount, 1);
         }
-        connection.end();
     });
+}
+//id = item_id in sql database
+//amt = amount to update item by
+//sign = 1 for add amt and -1 for subtract amt
+function updateStock(id, amt, sign) {
+    if (sign == -1) {
+        connection.query("UPDATE products SET stock_quantity = stock_quantity - " + amt + " WHERE item_id = " + id + ";", function (err, res) {
+            if (err) throw err;
+            console.log("Stock Updated.");
+        });
+    } else {
+        connection.query("UPDATE products SET stock_quantity = stock_quantity + " + amt + " WHERE item_id = " + id + ";", function (err, res) {
+            if (err) throw err;
+            console.log("Stock Updated.");
+        });
+    }
+    connection.end();
 }
 //validates that the argument given is an item id that maps to an entry in the database
 function validateID(id) {
+    console.log(numProducts);
     if (isNaN(id) || parseInt(id) > numProducts || parseInt(id) < 1) {
         console.log();
         console.log("Item ID given doesn't match a product in our database.");
@@ -161,11 +175,11 @@ function addNewProduct() {
             //attempt to perform the mysql query
             connection.query(queryString, function (err, res) {
                 if (err) throw err;
-                console.log("Added "+answer.amount+" " + answer.name+"(s) to products database.");
+                console.log("Added " + answer.amount + " " + answer.name + "(s) to products database.");
                 printProducts();
             })
         }
-        
+
     });
 }
 
@@ -174,7 +188,7 @@ function managerInput() {
         name: "method",
         type: "list",
         message: "Which action would you like to perform?",
-        choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"]
+        choices: ["View Products for Sale", "View Low Inventory", "Add to Inventory", "Add New Product","Exit"]
     }]).then(function (answer) {
         if (answer.method.toUpperCase() === "VIEW PRODUCTS FOR SALE") {
             printProducts();
@@ -184,10 +198,14 @@ function managerInput() {
             addInventory();
         } else if (answer.method.toUpperCase() === "ADD NEW PRODUCT") {
             addNewProduct();
-        } else {
+        } else if(answer.method.toUpperCase() === "EXIT"){
+            console.log("Exiting program.");
+            connection.end();
+            return;
+        }else {
             console.err("Unexpected selection.");
         }
     });
 
 }
-managerInput();
+printProducts();
